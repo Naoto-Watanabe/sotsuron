@@ -1,0 +1,58 @@
+\documentclass[11pt,a4paper]{article}
+%\documentclass[12pt, a4j]{jreport}
+\usepackage{amsmath,amssymb,amsthm,bm,euscript}
+\usepackage[whole]{bxcjkjatype}
+\usepackage[]{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage[toc,page]{appendix}
+\usepackage{float}
+\usepackage{comment}
+\usepackage{indentfirst}
+\usepackage{geometry}
+\geometry{left=30mm,right=30mm,top=30mm,bottom=30mm}
+
+\renewcommand{\baselinestretch}{1.5}
+\newcommand{\argmax}{\mathop{\rm arg~max}\limits}
+\newcommand{\argmin}{\mathop{\rm arg~min}\limits}
+\newcommand{\regret}{\mathop{\rm Regret}}
+
+\title{動的ベイジアン予測合成}
+\author{\emph{慶應義塾大学経済学部四年}\\　\emph{中妻照雄研究会} \\渡邉　直斗  }
+\date{}
+
+%\theoremstyle{break}
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+近年，ベイズ的手法を用いてのモデルや予測の比較,測定や結合に関する研究が行われている．その中で多くの，予測密度のプール化の手法が考案されてきた．
+\end{abstract}
+
+\clearpage
+\setcounter{tocdepth}{1}
+\tableofcontents
+\clearpage
+\newtheorem{theo}{定理}[section]
+\newtheorem{defi}[theo]{定義}
+\newtheorem{lemm}[theo]{補題}
+\newtheorem{Proof}{証明}
+
+\section{イントロダクション}
+
+
+\section{背景}
+\subsection{Agent Opinion Analysis}
+ここでは，基本的なAgent Opinion Analysisについてまとめる．この段階では，時系列解析には対応していない．\par
+ベイジアン意思決定者$\mathcal{D}$は$\mathcal{J}$のエージェント$\mathcal{A}_j,(j = 1:\mathcal{J})$が提供する情報をもとに結果$y$を予測する(ここでのエージェントは、モデル、予測者などを意味する)．
+まず，$\mathcal{D}$は事前確率$p(y)$を持ち，エージェントは予測情報である$h_j(y)$を提供する．提供された情報セットを$\mathcal{H} = \{h_1(\cdot),...,h_j(\cdot)\}$とすると，$\mathcal{D}$は自身の事後確率$p(p|\mathcal{H})$を用いて$y$を予測するようになる．これがAgent Opinion Analysisになる．\par
+しかし，各々のバイアスに加え，エージェント間の相互依存などが存在するため，簡単に$p(y,\mathcal{H})=p(y)p(\mathcal{H}|y)$を概念化できない．そこで，概念化のための関連するAgent Opinion Analysis理論についてまとめる．この理論では，$\mathcal{D}$は情報セット$\mathcal{H}$を観測する前に$p(y)$を指定すると仮定し，その期待値を$m({\bf x}) = E[\prod_{j=1:j}h_j({\b fx}_j)]$とする(ここで$\bold{x} = (x_1,...,x_j)'$はエージェントのダミー変数ベクトル)．すると，以下のベイジアンモデル$p(y,\mathcal{H})$のサブセットが導かれる．
+\[
+p(y|\mathcal{H}) = \int_x \alpha(y|{\bf x}) \prod_{j=1:j} h_j(x_j)d\bf x
+\]
+ここで，$\alpha (y|\bf x)$は$\bf x$が与えられたときの$y$の条件付き確率である．また，潜在因子$\bf x$は次の３つの解釈ができる．
+
+
+
+\end{document}
