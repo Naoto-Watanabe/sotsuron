@@ -17,7 +17,7 @@
 \newcommand{\argmin}{\mathop{\rm arg~min}\limits}
 \newcommand{\regret}{\mathop{\rm Regret}}
 
-\title{動的ベイジアン予測合成}
+\title{ベイジアンモデルを用いた時系列予測合成}
 \author{\emph{慶應義塾大学経済学部四年}\\　\emph{中妻照雄研究会} \\渡邉　直斗  }
 \date{}
 
@@ -42,16 +42,47 @@
 \section{イントロダクション}
 
 
-\section{背景}
+\section{手法}
+今回の論文では，Agent Opinion Analysisと呼ばれる統計的手法を動的に使えるように拡張した手法(McAlinn and West)を用いることによって分析を行う．
 \subsection{Agent Opinion Analysis}
-ここでは，基本的なAgent Opinion Analysisについてまとめる．この段階では，時系列解析には対応していない．\par
+ここでは，基本的なAgent Opinion Analysis(West 1992)についてまとめる．この段階では，時系列解析には対応していない．\par
 ベイジアン意思決定者$\mathcal{D}$は$\mathcal{J}$のエージェント$\mathcal{A}_j,(j = 1:\mathcal{J})$が提供する情報をもとに結果$y$を予測する(ここでのエージェントは、モデル、予測者などを意味する)．
 まず，$\mathcal{D}$は事前確率$p(y)$を持ち，エージェントは予測情報である$h_j(y)$を提供する．提供された情報セットを$\mathcal{H} = \{h_1(\cdot),...,h_j(\cdot)\}$とすると，$\mathcal{D}$は自身の事後確率$p(p|\mathcal{H})$を用いて$y$を予測するようになる．これがAgent Opinion Analysisになる．\par
-しかし，各々のバイアスに加え，エージェント間の相互依存などが存在するため，簡単に$p(y,\mathcal{H})=p(y)p(\mathcal{H}|y)$を概念化できない．そこで，概念化のための関連するAgent Opinion Analysis理論についてまとめる．この理論では，$\mathcal{D}$は情報セット$\mathcal{H}$を観測する前に$p(y)$を指定すると仮定し，その期待値を$m({\bf x}) = E[\prod_{j=1:j}h_j({\b fx}_j)]$とする(ここで$\bold{x} = (x_1,...,x_j)'$はエージェントのダミー変数ベクトル)．すると，以下のベイジアンモデル$p(y,\mathcal{H})$のサブセットが導かれる．
+しかし，各々のバイアスに加え，エージェント間の相互依存などが存在するため，簡単に$p(y,\mathcal{H})=p(y)p(\mathcal{H}|y)$を概念化できない．そこで，概念化のための関連するAgent Opinion Analysis理論(Gunest and Schervish 1985; West and Crosse 1992)についてまとめる．この理論では，$\mathcal{D}$は情報セット$\mathcal{H}$を観測する前に$p(y)$を指定すると仮定し，その期待値を$m({\bf x}) = E[\prod_{j=1:j}h_j({\b fx}_j)]$とする(ここで$\bold{x} = (x_1,...,x_j)'$はエージェントのダミー変数ベクトル)．すると，以下のベイジアンモデル$p(y,\mathcal{H})$のサブセットが導かれる．
 \[
-p(y|\mathcal{H}) = \int_x \alpha(y|{\bf x}) \prod_{j=1:j} h_j(x_j)d\bf x
+p(y|\mathcal{H}) = \int_x \alpha(y|{\bf x}) \prod_{j=1:j} h_j(x_J)d\bf x
 \]
-ここで，$\alpha (y|\bf x)$は$\bf x$が与えられたときの$y$の条件付き確率である．また，潜在因子$\bf x$は次の３つの解釈ができる．
+ここで，$\alpha (y|\bf x)$は$\bf x$が与えられたときの$y$の条件付き確率である．これにより，潜在因子$\bf x$は次の３つの解釈ができる．
+
+\subsection{動的連続設計}
+意思決定者$\mathcal{D}$は，各時系列$t = 1,2,...$において，エージェントから予測密度を受け取り，連続的に$y_t$を予測している．例えば，$t-1$の時，意思決定者$\mathcal{D}$は，エージェントから，予測密度のデータセット$\mathcal{H} = \{h_{t1}(y_t),...,h_{tJ}(y_t)\}$を受け取り，$y_t$を予測しようとする．意思決定者が，使う情報をまとめると$\{y_{1:t-1},\mathcal{H}_{1:t}\}$と表せる．前述のモデルを動的に対応できるよう拡張すると，意思決定者$\mathcal{D}$が，$yt$を予測するための$t-1$時点での分布は以下のような形になる．
+\[
+p(y_t|\Phi_t,y_{1:t-1},\mathcal{H}_{1:t}) \equiv p(y_t|\Phi_t,\mathcal{H}_t) = \int \alpha_t(y_t|{\bf x}_t,\Phi_t) \prod_{j=1:J} h_tj(x_{tj})dx_{tj}
+\]
+ここで，${\bf x}_t = x_{t,1:J}$は，時間$t$におけるエージェント$\mathcal{J}$の状態ベクトルで，$\alpha_t(y_t|{\bf x}_t,\Phi_t)$は意思決定者$\mathcal{D}$が，$y_t$を予測するため${\bf x}_t$を与えられた時の，条件付きキャリブレーションの確率密度関数である．そして$\Phi_t$は，$\mathcal{D}$の$t-1$時点での事後分布$p(\Phi_t|y_{1:t-1},\mathcal{H}_{1:t-1})$のパラメーターをキャリブレーションする確率密度関数を定義する時変パラメーターを表す．
+\[
+\alpha_t(y_t|x_t,\Phi_t) = N(y_t|F'_t\theta_t,v_t) \;{\rm with}\; F_t = (1,x'_t)' \;{\rm and}\; \theta_t = (\theta_{t0},\theta_{t1},...,\theta_{tJ})'
+\]
+
+\begin{equation}
+\begin{split}
+y_t &= F'_t\theta_t + v_t,   v_t \sim N(0,v_t),\\
+\theta_t &= \theta_{t-1} + w_t, w_t \sim N(0,v_tW_t)
+\end{split}
+\label{ons1}
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
